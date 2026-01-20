@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>【完全網羅版】熊本大学 英語長文完全学習システム</title>
+  <style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 1100px; margin: 0 auto; padding: 20px; background: #f8f9fa; color: #333; }
+    h1 { color: #800000; text-align: center; border-bottom: 4px solid #800000; padding-bottom: 10px; }
+    .card { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 25px; }
+    
+    /* 音声設定 */
+    .audio-config { background: #800000; color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; align-items: center; gap: 20px; }
+    input[type=range] { cursor: pointer; }
+
+    /* 文表表示 */
+    .sentence-block { border-left: 6px solid #800000; background: #fffaf0; padding: 20px; margin-bottom: 15px; border-radius: 0 10px 10px 0; position: relative; }
+    .sentence-block:hover { background: #fdf2f2; }
+    .eng-text { font-size: 1.15em; font-weight: 500; margin-bottom: 10px; display: block; }
+    .dict-word { color: #c0392b; font-weight: bold; border-bottom: 2px solid #ffadad; cursor: help; }
+
+    /* アクションボタン */
+    .btn-group { display: flex; gap: 10px; margin-top: 10px; }
+    button { padding: 8px 16px; border-radius: 6px; border: 1px solid #ddd; background: white; cursor: pointer; transition: 0.2s; }
+    button:hover { background: #eee; }
+    .btn-speak { border-color: #007bff; color: #007bff; font-weight: bold; }
+    .btn-speak:hover { background: #eef6ff; }
+
+    /* 単語帳 */
+    #my-vocab-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-top: 15px; }
+    .vocab-item { background: #fff; border: 2px solid #800000; padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
+
+    /* 解説モーダル */
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9999; justify-content: center; align-items: center; }
+    .modal-content { background: white; width: 90%; max-width: 700px; padding: 30px; border-radius: 15px; max-height: 80vh; overflow-y: auto; }
+    .info-box { background: #f1f3f5; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid #800000; }
+
+    /* ポップアップ */
+    .word-popup { position: absolute; background: white; border: 2px solid #800000; padding: 15px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: none; z-index: 5000; min-width: 200px; }
+    .accent { color: red; font-weight: bold; text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+<h1>🐻 熊本大学(2025) 英語長文・単語 全データ収録システム</h1>
+
+<div class="audio-config">
+  <strong>🔊 読上げ設定</strong>
+  <span>速度: <input type="range" id="v-speed" min="0.5" max="1.5" step="0.1" value="1.0"> <span id="v-speed-val">1.0</span>倍</span>
+  <span style="font-size: 0.8em;">※単語ホバーで発音＆登録が可能</span>
+</div>
+
+<div class="card">
+  <h3>📖 長文精読セクション（全27文）</h3>
+  <div id="main-content"></div>
+</div>
+
+<div class="card" style="background: #fff5f5;">
+  <h3>🌟 マイスカウター（単語帳）</h3>
+  <div id="my-vocab-list"></div>
+</div>
+
+<div id="word-popup" class="word-popup"></div>
+<div id="modal" class="modal" onclick="closeM()">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <h3 id="m-title" style="color:#800000"></h3>
+    <div id="m-body"></div>
+    <button onclick="closeM()" style="width:100%; margin-top:20px; background:#800000; color:white;">閉じる</button>
+  </div>
+</div>
+
+<script>
+// 全27文の完全データ
+const syntaxData = [
+  { e: "What is it about the modern shipping container that is so important?", t: "現代の輸送用コンテナの、一体何がそれほど重要なのでしょうか。", g: "「It is ～ that ...」という強調構文です。疑問詞 What が強調されているため、疑問文の形になっています。", p: "shipping container: 輸送用コンテナ" },
+  { e: "Surely not the thing itself.", t: "確かに、コンテナそのものではありません。", g: "前の文に対する答えで、主語と動詞が省略されています。itself は「それ自体」という強調の用法です。", p: "surely: 確かに、きっと" },
+  { e: "A soulless aluminum or steel box held together with welds and rivets, with a wooden floor and two enormous doors at one end: the standard container has all the romance of a tin can.", t: "溶接とリベットで固定された、木製の床と一端に2つの巨大な扉を備えた魂のないアルミや鋼鉄の箱。標準的なコンテナは、缶詰と同じくらいの情緒しか持ち合わせていません。", g: "コロン（：）の前の部分は、コンテナを具体的に説明する名詞句です。held together は過去分詞で box を修飾しています。", p: "soulless: 魂のない<br>enormous: 巨大な<br>romance: 情緒、ロマン" },
+  { e: "The value of this object lies not in what it is, but in how it is used.", t: "この物体の価値は、それが何であるかではなく、どのように使われるかにあります。", g: "「not in A but in B（AにではなくBにある）」という対比の構造です。what it is は「そのものの正体」を指します。", p: "lie in: ～にある、存在する" },
+  { e: "The container is at the core of a highly automated system for moving goods from anywhere, to anywhere, with a minimum of cost and complication on the way.", t: "コンテナは、途中のコストと煩雑さを最小限に抑え、あらゆる場所からあらゆる場所へ商品を移動させるための、高度に自動化されたシステムの核心なのです。", g: "「at the core of（～の核心に）」が補語です。for moving 以下の動名詞句が system を詳しく説明しています。", p: "highly automated: 高度に自動化された<br>minimum: 最小限" },
+  { e: "The container made shipping cheap, and by doing so, changed the shape of the world economy.", t: "コンテナは輸送を安価にし、そうすることで世界経済の姿を変えました。", g: "made(V) shipping(O) cheap(C) の第5文型です。by doing so は「そうすることによって」という手段を表します。", p: "cheap: 安価な<br>economy: 経済" },
+  { e: "The container has created a world in which people can and do live anywhere.", t: "コンテナは、人々がどこにでも住むことができ、実際に住んでいる世界作り出しました。", g: "in which は関係代名詞で a world を修飾しています。can and do は live を強調しています。", p: "create: 創造する" },
+  { e: "In many ways, the container is at the heart of the modern world.", t: "多くの意味で、コンテナは現代世界の中心にあります。", g: "In many ways は「多くの点で」という慣用句です。at the heart of は「～の核心に」という意味です。", p: "modern world: 現代世界" },
+  { e: "However, for those whose lives were once tied to the sea, its arrival was not a cause for celebration.", t: "しかし、かつて生活が海と結びついていた人々にとって、その到来は祝福すべきことではありませんでした。", g: "whose は関係代名詞の所有格で those を修飾しています。tied to は「～に結びついた」という意味です。", p: "tie to: ～に結びつける<br>celebration: 祝福" },
+  { e: "Before the age of the container, shipping was a slow and expensive process.", t: "コンテナの時代以前、輸送は時間がかかり、費用の高いプロセスでした。", g: "Before the age of は「～の時代より前」という意味です。主語は shipping です。", p: "expensive: 高価な<br>process: 過程" },
+  { e: "Goods were carried one by one by ill-paid workers.", t: "商品は低賃金の労働者によって一つずつ運ばれていました。", g: "were carried は受動態です。one by one は「一つずつ」という副詞句です。", p: "ill-paid: 低賃金の" },
+  { e: "Port towns were busy, tight-knit communities where everyone knew the rhythm of the tides.", t: "港町は、誰もが潮の満ち引きのリズムを知っている、結束の固い活気あるコミュニティでした。", g: "where は関係副詞で communities を修飾しています。tight-knit は「結束の固い」という意味です。", p: "tight-knit: 結束の固い<br>rhythm: リズム" },
+  { e: "The container brought a sharp decline in the demand for such workers.", t: "コンテナは、そのような労働者の需要を急激に減少させました。", g: "brought(V) a sharp decline(O) という第3文型の構造です。demand for は「～の需要」という意味です。", p: "decline: 減少" },
+  { e: "Whole neighborhoods that had lived off the docks for generations found themselves unsuited for the new world.", t: "何世代にもわたってドックを生活の糧にしてきた近隣住民全員が、自分たちが新しい世界に適していないことに気づきました。", g: "that は関係代名詞です。found themselves unsuited は「自分たちが不適合であるとわかる」という第5文型です。", p: "unsuited: 適していない" },
+  { e: "Their methods were seen as antiquated.", t: "彼らのやり方は時代遅れだと見なされました。", g: "were seen as は「～として見なされた」という受動態の表現です。", p: "antiquated: 時代遅れの" },
+  { e: "They had a long pedigree of skill and hard work.", t: "彼らには技能と勤勉さの長い歴史（由緒）がありました。", g: "pedigree は本来「家系」ですが、ここでは「積み重ねてきた歴史」を指します。", p: "pedigree: 歴史、由緒" },
+  { e: "But the new shipping vessels were too massive for the old ports.", t: "しかし、新しい輸送船は古い港には巨大すぎました。", g: "too ～ for ... は「...にとって～すぎる」という表現です。vessels は「船」を指します。", p: "vessel: 船<br>massive: 巨大な" },
+  { e: "The big advantage of the container was speed.", t: "コンテナの大きな利点は速度でした。", g: "S V C の第2文型です。advantage は「利点」という意味です。", p: "advantage: 利点" },
+  { e: "Speed meant that the cost of shipping fell dramatically.", t: "速度は、輸送コストが劇的に下がることを意味しました。", g: "meant that ... は「～ということを意味した」という構造です。dramatically は「劇的に」です。", p: "dramatically: 劇的に" },
+  { e: "This changed the map of industrial production.", t: "これが工業生産の地図を変えました。", g: "production は「生産」です。industrial は「工業の」という意味です。", p: "industrial production: 工業生産" },
+  { e: "Factories no longer had to be near the consumer population.", t: "工場はもはや消費者の人口の近くにある必要はなくなりました。", g: "no longer は「もはや～ない」。had to は「～しなければならなかった」の否定的な文脈です。", p: "population: 人口" },
+  { e: "They could be anywhere where labor was cheap.", t: "労働力が安い場所であれば、どこにでも存在できるようになりました。", g: "where は関係副詞です。labor は「労働力」を指します。", p: "labor: 労働" },
+  { e: "The container made the exotic feel local.", t: "コンテナは、異国情緒あるものを身近なものに感じさせました。", g: "made(使役動詞) + the exotic(O) + feel(原形不定詞) の構造です。", p: "exotic: 異国情緒のある" },
+  { e: "Fresh fruit from the other side of the world could be sold in any supermarket.", t: "世界の反対側からの新鮮な果物が、どこのスーパーマーケットでも売られるようになりました。", g: "could be sold は受動態の可能表現です。", p: "supermarket: スーパーマーケット" },
+  { e: "This came with a human cost.", t: "これには人間的な代償が伴いました。", g: "cost はここでは「代償」や「犠牲」という意味で使われています。", p: "human cost: 人間的な代償" },
+  { e: "The local shops could not compete with the low prices of imported goods.", t: "地元の商店は、輸入品の低価格に対抗することができませんでした。", g: "compete with は「～と競争する、対抗する」という意味です。", p: "compete with: ～と競争する" },
+  { e: "The container, in its simplicity, had triggered a revolution.", t: "コンテナはその単純さゆえに、革命を引き起こしたのです。", g: "triggered は「～を引き起こした」。revolution は「革命」です。", p: "trigger: 引き起こす<br>revolution: 革命" }
+];
+
+// 全40語の単語リスト
+const vocabData = {
+  "shipping": { r: "シ【ピ】ング", m: "輸送、航運" },
+  "soulless": { r: "【ソ】ウルレス", m: "魂のない、感情のない" },
+  "enormous": { r: "イ【ノ】ーマス", m: "巨大な、莫大な" },
+  "automated": { r: "【オ】ートメイティド", m: "自動化された" },
+  "complication": { r: "コンプリ【ケ】イシャン", m: "複雑さ、面倒なこと" },
+  "economy": { r: "イ【コ】ノミー", m: "経済" },
+  "ill-paid": { r: "イル・【ペ】イド", m: "低賃金の" },
+  "tight-knit": { r: "【タイト】ニット", m: "結束の固い" },
+  "decline": { r: "ディク【ライ】ン", m: "衰退、減少" },
+  "unsuited": { r: "アン【ス】ーティド", m: "適していない" },
+  "antiquated": { r: "【ア】ンティクウェイティド", m: "時代遅れの、古臭い" },
+  "pedigree": { r: "【ペ】ディグリー", m: "歴史、由緒" },
+  "exotic": { r: "イグ【ゾ】ティク", m: "異国情緒のある、外来の" },
+  "vessel": { r: "【ヴェ】スル", m: "（大型の）船" },
+  "massive": { r: "【マ】スィヴ", m: "巨大な、大規模な" },
+  "advantage": { r: "アド【ヴァ】ンティッジ", m: "利点、強み" },
+  "population": { r: "パピュ【レ】イシャン", m: "人口" },
+  "labor": { r: "【レ】イバー", m: "労働" },
+  "imported": { r: "イム【ポ】ーティド", m: "輸入された" },
+  "trigger": { r: "【ト】リガー", m: "引き起こす、引き金" },
+  "revolution": { r: "レヴォ【ル】ーシャン", m: "革命" },
+  "aluminum": { r: "ア【ル】ミナム", m: "アルミニウム" },
+  "steel": { r: "ス【ティ】ール", m: "鋼鉄" },
+  "wooden": { r: "【ウ】ッドゥン", m: "木製の" },
+  "standard": { r: "ス【タ】ンダード", m: "標準的な" },
+  "romance": { r: "ロ【マ】ンス", m: "情緒、ロマン" },
+  "object": { r: "【オ】ブジェクト", m: "物体、対象" },
+  "core": { r: "【コ】ア", m: "核心、中心" },
+  "expensive": { r: "イクス【ペ】ンスィヴ", m: "高価な" },
+  "process": { r: "プ【ロ】セス", m: "過程、工程" },
+  "community": { r: "コ【ミュ】ニティ", m: "地域社会、共同体" },
+  "demand": { r: "ディ【マ】ンド", m: "需要" },
+  "generation": { r: "ジェネ【レ】イシャン", m: "世代" },
+  "method": { r: "【メ】ソッド", m: "方法" },
+  "industrial": { r: "イン【ダ】ストリアル", m: "工業の、産業の" },
+  "production": { r: "プ【ラ】ダクション", m: "生産" },
+  "consumer": { r: "コン【ス】ーマー", m: "消費者" },
+  "dramatically": { r: "ドラ【マ】ティカリー", m: "劇的に" },
+  "simplicity": { r: "スィムプ【リ】スィティ", m: "単純さ、簡素さ" },
+  "supermarket": { r: "【ス】ーパーマーケット", m: "スーパーマーケット" }
+};
+
+let myVocab = [];
+
+function init() {
+  const main = document.getElementById('main-content');
+  const speed = document.getElementById('v-speed');
+  speed.oninput = () => document.getElementById('v-speed-val').innerText = speed.value;
+
+  syntaxData.forEach((d, i) => {
+    let eHtml = d.e;
+    // 単語ハイライト処理（長い単語から順にマッチング）
+    Object.keys(vocabData).sort((a,b)=>b.length-a.length).forEach(v => {
+      const reg = new RegExp(`\\b${v}\\b`, 'gi');
+      eHtml = eHtml.replace(reg, `<span class="dict-word" onmouseover="pop(event,'${v}')">${v}</span>`);
+    });
+
+    const div = document.createElement('div');
+    div.className = 'sentence-block';
+    div.innerHTML = `
+      <span class="eng-text"><strong>${i+1}.</strong> ${eHtml}</span>
+      <div class="btn-group">
+        <button class="btn-speak" onclick="speak('${d.e}')">🔊 再生</button>
+        <button onclick="toggleT(${i})">和訳</button>
+        <button onclick="openM(${i})">文法・熟語解説</button>
+      </div>
+      <div id="trans-${i}" style="display:none; margin-top:10px; color:#800000; font-weight:bold;">${d.t}</div>
+    `;
+    main.appendChild(div);
+  });
+}
+
+function speak(text) {
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text.replace(/<[^>]*>/g, ''));
+  u.lang = 'en-US';
+  u.rate = parseFloat(document.getElementById('v-speed').value);
+  window.speechSynthesis.speak(u);
+}
+
+function pop(e, w) {
+  const p = document.getElementById('word-popup');
+  const info = vocabData[w.toLowerCase()];
+  if(!info) return;
+  const reading = info.r.replace(/【(.*?)】/g, '<span class="accent">$1</span>');
+  p.innerHTML = `
+    <strong>${w}</strong><br><small>${reading}</small><br><b>${info.m}</b><br>
+    <div style="margin-top:8px; display:flex; gap:5px;">
+      <button onclick="speak('${w}')" style="font-size:0.7em;">🔊</button>
+      <button onclick="add('${w}')" style="font-size:0.7em; background:#800000; color:white;">登録</button>
+    </div>
+  `;
+  p.style.display = 'block'; p.style.left = (e.pageX + 10) + 'px'; p.style.top = (e.pageY + 10) + 'px';
+  setTimeout(() => { p.style.display = 'none'; }, 4000);
+}
+
+function add(w) { if(!myVocab.includes(w)) { myVocab.push(w); updateV(); } }
+function updateV() {
+  const list = document.getElementById('my-vocab-list');
+  list.innerHTML = myVocab.map(w => `
+    <div class="vocab-item">
+      <span><b>${w}</b><br><small>${vocabData[w.toLowerCase()].m}</small></span>
+      <button onclick="speak('${w}')">🔊</button>
+    </div>
+  `).join('');
+}
+
+function toggleT(i) { const el = document.getElementById(`trans-${i}`); el.style.display = el.style.display === 'none' ? 'block' : 'none'; }
+function openM(i) {
+  const d = syntaxData[i];
+  document.getElementById('m-title').innerText = `No.${i+1} 徹底解説`;
+  document.getElementById('m-body').innerHTML = `
+    <div class="info-box"><strong>【文法事項】</strong><br>${d.g}</div>
+    <div class="info-box"><strong>【重要表現】</strong><br>${d.p}</div>
+  `;
+  document.getElementById('modal').style.display = 'flex';
+}
+function closeM() { document.getElementById('modal').style.display = 'none'; }
+
+init();
+</script>
+</body>
+</html>
