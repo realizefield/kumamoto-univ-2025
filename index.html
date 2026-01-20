@@ -2,40 +2,44 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>【完全統合版】熊本大学 2025 英語マスター</title>
+  <title>【完全統合版】熊本大学 2025 英語：学習＆合格判定システム</title>
   <style>
-    body { font-family: 'Segoe UI', Tahoma, sans-serif; max-width: 1100px; margin: 0 auto; padding: 20px; background: #fdfdfd; line-height: 1.8; color: #333; }
-    h1 { color: #800000; text-align: center; border-bottom: 4px solid #800000; padding-bottom: 10px; margin-bottom: 30px; }
+    body { font-family: 'Segoe UI', sans-serif; max-width: 1100px; margin: 0 auto; padding: 20px; background: #fdfdfd; line-height: 1.8; color: #333; }
+    h1 { color: #800000; text-align: center; border-bottom: 4px solid #800000; padding-bottom: 10px; }
     .card { background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 25px; border: 1px solid #eee; }
     
-    /* ナビゲーション */
+    /* タブ */
     .nav-tabs { display: flex; gap: 10px; margin-bottom: 20px; position: sticky; top: 0; background: white; z-index: 1000; padding: 10px 0; }
-    .nav-tabs button { flex: 1; padding: 15px; border-radius: 8px; border: 2px solid #800000; background: white; color: #800000; cursor: pointer; font-weight: bold; transition: 0.3s; }
+    .nav-tabs button { flex: 1; padding: 15px; border-radius: 8px; border: 2px solid #800000; background: white; color: #800000; cursor: pointer; font-weight: bold; }
     .nav-tabs button.active { background: #800000; color: white; }
 
     /* 学習モード */
     .sentence-item { border-left: 6px solid #800000; background: #fffaf0; padding: 20px; margin-bottom: 20px; border-radius: 0 10px 10px 0; }
-    .eng-txt { font-weight: bold; font-size: 1.2em; display: block; margin-bottom: 10px; color: #000; }
+    .eng-txt { font-weight: bold; font-size: 1.2em; display: block; margin-bottom: 12px; color: #000; }
     .dict-word { color: #c0392b; font-weight: bold; border-bottom: 2px solid #ffadad; cursor: help; }
-    .detail-box { display: none; margin-top: 15px; padding: 20px; background: #fff; border: 1px solid #ddd; border-radius: 8px; }
     
-    /* テストモード */
+    /* 解説ボタン・セクション（分離表示） */
+    .btn-row { margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn-row button { padding: 6px 12px; border-radius: 5px; border: 1px solid #ccc; background: white; cursor: pointer; font-size: 0.9em; }
+    .btn-row button:hover { background: #f0f0f0; }
+    .info-box { margin-top: 10px; padding: 15px; background: #fff; border: 1px solid #ddd; border-radius: 8px; display: none; }
+    .label-g { color: #800000; font-weight: bold; }
+    .label-p { color: #2c3e50; font-weight: bold; }
+    .label-t { color: #006400; font-weight: bold; }
+
+    /* 合格判定テスト */
+    .passage-box { background: #f9f9f9; padding: 20px; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 20px; font-size: 1em; color: #444; }
+    .quiz-block { border: 2px solid #eee; padding: 20px; border-radius: 12px; margin-bottom: 20px; background: #fff; }
     .notice-box { background: #fff5f5; border: 1px solid #feb2b2; padding: 15px; border-radius: 8px; margin-bottom: 20px; color: #c53030; font-weight: bold; }
-    .quiz-block { border: 2px solid #eee; padding: 25px; border-radius: 15px; margin-bottom: 30px; background: #fff; }
-    .res-area { margin-top: 15px; padding: 20px; border-radius: 10px; display: none; font-weight: bold; line-height: 1.6; }
-    .correct { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-    .partial { background: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
-    .incorrect { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    .res-area { margin-top: 10px; padding: 15px; border-radius: 8px; display: none; font-weight: bold; }
+    .correct { background: #d4edda; color: #155724; }
+    .partial { background: #fff3cd; color: #856404; }
+    .incorrect { background: #f8d7da; color: #721c24; }
 
     /* UI要素 */
     textarea, input[type="text"] { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; margin-top: 10px; font-size: 1em; box-sizing: border-box; }
-    .btn-judge { background: #2c3e50; color: white; padding: 14px 28px; border: none; border-radius: 6px; cursor: pointer; margin-top: 10px; font-weight: bold; width: 100%; }
-    .btn-speak { background: #fff; color: #007bff; border: 1px solid #007bff; padding: 6px 14px; border-radius: 5px; font-size: 0.9em; cursor: pointer; margin-right: 8px; font-weight: bold; }
-    .btn-detail { background: #800000; color: white; border: none; padding: 6px 14px; border-radius: 5px; font-size: 0.9em; cursor: pointer; }
-    
-    /* 単語ポップアップ */
-    .word-popup { position: absolute; background: white; border: 2px solid #800000; padding: 15px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: none; z-index: 5000; min-width: 250px; }
-    .accent { color: red; font-weight: bold; text-decoration: underline; }
+    .btn-judge { background: #2c3e50; color: white; padding: 12px; border: none; border-radius: 6px; cursor: pointer; margin-top: 10px; width: 100%; font-weight: bold; }
+    .word-popup { position: absolute; background: white; border: 2px solid #800000; padding: 15px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: none; z-index: 5000; min-width: 200px; }
   </style>
 </head>
 <body>
@@ -43,73 +47,71 @@
 <h1>🐻 熊本大学(2025) 英語学習＆合格判定システム</h1>
 
 <div class="nav-tabs">
-  <button id="tab-study" class="active" onclick="showMode('study')">📚 学習モード</button>
+  <button id="tab-study" class="active" onclick="showMode('study')">📚 学習モード（全27文）</button>
   <button id="tab-quiz" onclick="showMode('quiz')">🎓 合格判定テスト</button>
 </div>
 
 <div id="mode-study" class="card">
-  <div style="margin-bottom:20px; background:#f1f3f5; padding:15px; border-radius:10px; display:flex; align-items:center; gap:15px;">
-    <strong>🔊 再生速度:</strong>
-    <input type="range" id="v-speed" min="0.5" max="1.5" step="0.1" value="1.0" oninput="document.getElementById('v-val').innerText=this.value">
-    <span id="v-val">1.0</span>倍速
-  </div>
+  <div style="margin-bottom:20px;">🔊 速度: <input type="range" id="v-speed" min="0.5" max="1.5" step="0.1" value="1.0"></div>
   <div id="study-list"></div>
 </div>
 
 <div id="mode-quiz" class="card" style="display:none;">
-  <div class="notice-box">
-    ⚠️ 判定について：記述問題は、解答に必須となるキーワードが含まれているかどうかで判定します。終了後は表示される模範解答と必ず見比べてください。
-  </div>
+  <div class="notice-box">問3〜問6は記述式のため、必須キーワードが含まれているかどうかで判定します。終了後は模範解答と必ず照らし合わせてください。</div>
+  <div class="passage-box" id="passage-all"></div>
+  
   <div id="quiz-list">
     <div class="quiz-block">
-      <strong>問 1: 次の文の空所(1)に入る適切な語を答えなさい。</strong>
-      <p>What is it about the modern shipping container **(1)** is so important?</p>
+      <strong>問 1: 空所 (1) に入る適切な語を答えなさい。</strong>
       <input type="text" id="q1" placeholder="英単語を入力">
       <button class="btn-judge" onclick="judgeStrict('q1', 'res1', 'that')">判定</button>
       <div id="res1" class="res-area"></div>
     </div>
     <div class="quiz-block">
-      <strong>問 2: 次の文の空所(2)に入る適切な語を答えなさい。</strong>
-      <p>The value of this object lies not in what it is, **(2)** in how it is used.</p>
+      <strong>問 2: 空所 (2) に入る適切な語を答えなさい。</strong>
       <input type="text" id="q2" placeholder="英単語を入力">
       <button class="btn-judge" onclick="judgeStrict('q2', 'res2', 'but')">判定</button>
       <div id="res2" class="res-area"></div>
     </div>
     <div class="quiz-block">
       <strong>問 3: 太字部分 **at the core of a highly automated system** の意味を、日本文の空所に合うように完成させなさい。</strong>
-      <p>日本文：コンテナは、商品を移動させるための【 A 】の【 B 】なのです。</p>
+      <p>コンテナは、商品を移動させるための【 A 】の【 B 】なのです。</p>
       <input type="text" id="q3a" placeholder="Aに入る語句">
       <input type="text" id="q3b" placeholder="Bに入る語句">
       <button class="btn-judge" onclick="judgeQ3()">判定</button>
       <div id="res3" class="res-area"></div>
     </div>
     <div class="quiz-block">
-      <strong>問 4: 次の太字部分を和訳しなさい。</strong>
+      <strong>問 4: 英文 21 の太字部分を和訳しなさい。</strong>
       <p>**Factories no longer had to be near the consumer population.**</p>
       <textarea id="q4" placeholder="和訳を入力"></textarea>
-      <button class="btn-judge" onclick="judgeKeyword('q4', 'res4', ['もはや', '必要', 'ない'], '工場はもはや消費者の人口の近くにある必要はなくなりました。')">キーワード判定</button>
+      <button class="btn-judge" onclick="judgeKeyword('q4', 'res4', ['もはや', '必要', 'ない'], '工場はもはや消費者の人口の近くにある必要はなくなりました。')">判定</button>
       <div id="res4" class="res-area"></div>
     </div>
     <div class="quiz-block">
-      <strong>問 5: 次の太字部分 **human cost** が指す具体的な内容を説明しなさい。</strong>
+      <strong>問 5: 英文 25 の **human cost** が指す具体的な内容を説明しなさい。</strong>
       <textarea id="q5" placeholder="説明を入力"></textarea>
-      <button class="btn-judge" onclick="judgeKeyword('q5', 'res5', ['地元', '商店', '対抗', '価格', '安さ', '代償', '犠牲'], '地元の商店が安価な輸入品の価格に対抗できなくなったり、労働者の仕事が失われたりするなどの人間的な犠牲や代償のこと。')">キーワード判定</button>
+      <button class="btn-judge" onclick="judgeKeyword('q5', 'res5', ['地元', '商店', '対抗', '価格', '安さ', '代償', '犠牲'], '地元の商店が安価な輸入品の価格に対抗できなくなったり、労働者の仕事が失われたりするなどの人間的な犠牲や代償のこと。')">判定</button>
       <div id="res5" class="res-area"></div>
     </div>
     <div class="quiz-block">
-      <strong>問 6: 次の太字部分 **in its simplicity** の意味をふまえて和訳を完成させなさい。</strong><br>
+      <strong>問 6: 英文 27 の **in its simplicity** をふまえて和訳を完成させなさい。</strong>
       <p>コンテナは【 】ゆえに、革命を引き起こした。</p>
-      <textarea id="q6" placeholder="【 】に入る言葉を入力"></textarea>
-      <button class="btn-judge" onclick="judgeKeyword('q6', 'res6', ['単純', '簡素', 'シンプル'], 'コンテナはその単純さ（シンプルさ）ゆえに、革命を引き起こした。')">キーワード判定</button>
+      <input type="text" id="q6" placeholder="【 】に入る言葉">
+      <button class="btn-judge" onclick="judgeKeyword('q6', 'res6', ['単純', '簡素', 'シンプル'], 'コンテナはその単純さ（シンプルさ）ゆえに、革命を引き起こした。')">判定</button>
       <div id="res6" class="res-area"></div>
     </div>
   </div>
 </div>
 
+<div class="card" style="border: 2px solid #800000;">
+  <h3>🌟 マイスカウター（登録単語帳）</h3>
+  <div id="vocab-list"></div>
+</div>
+
 <div id="word-popup" class="word-popup"></div>
 
 <script>
-// 全27文（データ完全版）
 const syntaxData = [
   { e: "What is it about the modern shipping container that is so important?", t: "現代の輸送用コンテナの、一体何がそれほど重要なのでしょうか。", g: "「It is ～ that ...」という強調構文です。疑問詞 What が強調されているため、疑問文の形になっています。", p: "shipping container: 輸送用コンテナ" },
   { e: "Surely not the thing itself.", t: "確かに、コンテナそのものではありません。", g: "前の文に対する答えで、主語と動詞が省略されています。itself は「それ自体」という強調の用法です。", p: "surely: 確かに、きっと" },
@@ -117,7 +119,7 @@ const syntaxData = [
   { e: "The value of this object lies not in what it is, but in how it is used.", t: "この物体の価値は、それが何であるかではなく、どのように使われるかにあります。", g: "「not in A but in B（AにではなくBにある）」という対比の構造です。what it is は「そのものの正体」を指します。", p: "lie in: ～にある、存在する" },
   { e: "The container is at the core of a highly automated system for moving goods from anywhere, to anywhere, with a minimum of cost and complication on the way.", t: "コンテナは、途中のコストと煩雑さを最小限に抑え、あらゆる場所からあらゆる場所へ商品を移動させるための、高度に自動化されたシステムの核心なのです。", g: "「at the core of（～の核心に）」が補語です。for moving 以下の動名詞句が system を詳しく説明しています。", p: "highly automated: 高度に自動化された / minimum: 最小限" },
   { e: "The container made shipping cheap, and by doing so, changed the shape of the world economy.", t: "コンテナは輸送を安価にし、そうすることで世界経済の姿を変えました。", g: "made(V) shipping(O) cheap(C) の第5文型です。by doing so は「そうすることによって」という手段を表します。", p: "cheap: 安価な / economy: 経済" },
-  { e: "The container has created a world in which people can and do live anywhere.", t: "コンテナは、人々がどこにでも住むことができ、実際に住んでいる世界を作り出しました。", g: "in which は関係代名詞で a world を修飾しています。can and do は live を強調しています。", p: "create: 創造する" },
+  { e: "The container has created a world in which people can and do live anywhere.", t: "コンテナは、人々がどこにでも住むことができ、実際に住んでいる世界作り出しました。", g: "in which は関係代名詞で a world を修飾しています。can and do は live を強調しています。", p: "create: 創造する" },
   { e: "In many ways, the container is at the heart of the modern world.", t: "多くの意味で、コンテナは現代世界の中心にあります。", g: "In many ways は「多くの点で」という慣用句です。at the heart of は「～の核心に」という意味です。", p: "modern world: 現代世界" },
   { e: "However, for those whose lives were once tied to the sea, its arrival was not a cause for celebration.", t: "しかし、かつて生活が海と結びついていた人々にとって、その到来は祝福すべきことではありませんでした。", g: "whose は関係代名詞の所有格で those を修飾しています。tied to は「～に結びついた」という意味です。", p: "tie to: ～に結びつける / celebration: 祝福" },
   { e: "Before the age of the container, shipping was a slow and expensive process.", t: "コンテナの時代以前、輸送は時間がかかり、費用の高いプロセスでした。", g: "Before the age of は「～の時代より前」という意味です。主語は shipping です。", p: "expensive: 高価な / process: 過程" },
@@ -141,31 +143,36 @@ const syntaxData = [
 ];
 
 const vocabData = {
-  "shipping": { r: "シ【ピ】ング", m: "輸送、航運" }, "soulless": { r: "【ソ】ウルレス", m: "魂のない、感情のない" },
-  "enormous": { r: "イ【ノ】ーマス", m: "巨大な、莫大な" }, "automated": { r: "【オ】ートメイティド", m: "自動化された" },
-  "complication": { r: "コンプリ【ケ】イシャン", m: "複雑さ、面倒なこと" }, "economy": { r: "イ【コ】ノミー", m: "経済" },
+  "shipping": { r: "シ【ピ】ング", m: "輸送、航運" }, "soulless": { r: "【ソ】ウルレス", m: "魂のない" },
+  "enormous": { r: "イ【ノ】ーマス", m: "巨大な" }, "automated": { r: "【オ】ートメイティド", m: "自動化された" },
+  "complication": { r: "コンプリ【ケ】イシャン", m: "複雑さ" }, "economy": { r: "イ【コ】ノミー", m: "経済" },
   "ill-paid": { r: "イル・【ペ】イド", m: "低賃金の" }, "tight-knit": { r: "【タイト】ニット", m: "結束の固い" },
   "decline": { r: "ディク【ライ】ン", m: "衰退、減少" }, "unsuited": { r: "アン【ス】ーティド", m: "適していない" },
-  "antiquated": { r: "【ア】ンティクウェイティド", m: "時代遅れの、古臭い" }, "pedigree": { r: "【ペ】ディグリー", m: "歴史、由緒" },
-  "exotic": { r: "イグ【ゾ】ティク", m: "異国情緒のある、外来の" }, "vessel": { r: "【ヴェ】スル", m: "船" },
+  "antiquated": { r: "【ア】ンティクウェイティド", m: "時代遅れの" }, "pedigree": { r: "【ペ】ディグリー", m: "歴史、由緒" },
+  "exotic": { r: "イグ【ゾ】ティク", m: "異国情緒のある" }, "vessel": { r: "【ヴェ】スル", m: "船" },
   "massive": { r: "【マ】スィヴ", m: "巨大な" }, "advantage": { r: "アド【ヴァ】ンティッジ", m: "利点" },
   "population": { r: "パピュ【レ】イシャン", m: "人口" }, "labor": { r: "【レ】イバー", m: "労働" },
   "imported": { r: "イム【ポ】ーティド", m: "輸入された" }, "trigger": { r: "【ト】リガー", m: "引き起こす" },
-  "revolution": { r: "レヴォ【ル】ーシャン", m: "革命" }, "aluminum": { r: "ア【ル】ミナム", m: "アルミニウム" },
+  "revolution": { r: "レヴォ【ル】ーシャン", m: "革命" }, "aluminum": { r: "ア【ル】ミナム", m: "アルミ" },
   "steel": { r: "ス【ティ】ール", m: "鋼鉄" }, "wooden": { r: "【ウ】ッドゥン", m: "木製の" },
   "standard": { r: "ス【タ】ンダード", m: "標準" }, "romance": { r: "ロ【マ】ンス", m: "情緒" },
   "object": { r: "【オ】ブジェクト", m: "物体" }, "core": { r: "【コ】ア", m: "核心" },
   "expensive": { r: "イクス【ペ】ンスィヴ", m: "高価な" }, "process": { r: "プ【ロ】セス", m: "過程" },
-  "community": { r: "コ【ミュ】ニティ", m: "共同体" }, "demand": { r: "ディ【マ】ンド", m: "需要" },
+  "community": { r: "コ【ミュ】ニティ", m: "地域社会" }, "demand": { r: "ディ【マ】ンド", m: "需要" },
   "generation": { r: "ジェネ【レ】イシャン", m: "世代" }, "method": { r: "【メ】ソッド", m: "方法" },
   "industrial": { r: "イン【ダ】ストリアル", m: "工業の" }, "production": { r: "プ【ラ】ダクション", m: "生産" },
   "consumer": { r: "コン【ス】ーマー", m: "消費者" }, "dramatically": { r: "ドラ【マ】ティカリー", m: "劇的に" },
   "simplicity": { r: "スィムプ【リ】スィティ", m: "単純さ" }, "supermarket": { r: "【ス】ーパーマーケット", m: "スーパー" }
 };
 
+let myStock = [];
+
 function init() {
   const study = document.getElementById('study-list');
+  const passage = document.getElementById('passage-all');
+  
   syntaxData.forEach((d, i) => {
+    // 学習モード
     let eHtml = d.e;
     Object.keys(vocabData).sort((a,b)=>b.length-a.length).forEach(v => {
       const reg = new RegExp(`\\b${v}\\b`, 'gi');
@@ -173,21 +180,30 @@ function init() {
     });
     const div = document.createElement('div');
     div.className = 'sentence-item';
-    div.innerHTML = `<span class="eng-txt">(${i+1}) ${eHtml}</span><button class="btn-speak" onclick="speak('${d.e}')">🔊 再生</button><button class="btn-detail" onclick="toggleD(${i})">📖 解説/和訳</button><div id="d-${i}" class="detail-box"><b>【和訳】</b><br>${d.t}<br><b>【文法解説】</b><br>${d.g}<br><b>【重要語句】</b><br>${d.p}</div>`;
+    div.innerHTML = `<span class="eng-txt">(${i+1}) ${eHtml}</span>
+      <div class="btn-row">
+        <button onclick="speak('${d.e}')">🔊 再生</button>
+        <button onclick="toggleInfo(${i},'t')">和訳</button>
+        <button onclick="toggleInfo(${i},'g')">文法解説</button>
+        <button onclick="toggleInfo(${i},'p')">重要語句</button>
+      </div>
+      <div id="t-${i}" class="info-box"><span class="label-t">【和訳】</span>${d.t}</div>
+      <div id="g-${i}" class="info-box"><span class="label-g">【文法解説】</span>${d.g}</div>
+      <div id="p-${i}" class="info-box"><span class="label-p">【重要語句】</span>${d.p}</div>`;
     study.appendChild(div);
+
+    // テストモード用長文
+    let qE = d.e;
+    if(i===0) qE = qE.replace("that", "<strong>(1)</strong>");
+    if(i===3) qE = qE.replace("but", "<strong>(2)</strong>");
+    if(i===4) qE = qE.replace("at the core of a highly automated system", "<strong>(3)</strong>");
+    passage.innerHTML += qE + " ";
   });
 }
 
-function showMode(m) {
-  document.getElementById('mode-study').style.display = m === 'study' ? 'block' : 'none';
-  document.getElementById('mode-quiz').style.display = m === 'quiz' ? 'block' : 'none';
-  document.getElementById('tab-study').className = m === 'study' ? 'active' : '';
-  document.getElementById('tab-quiz').className = m === 'quiz' ? 'active' : '';
-}
-
-function toggleD(i) {
-  const el = document.getElementById(`d-${i}`);
-  el.style.display = (el.style.display === 'block' ? 'none' : 'block');
+function toggleInfo(i, type) {
+  const el = document.getElementById(`${type}-${i}`);
+  el.style.display = el.style.display === 'block' ? 'none' : 'block';
 }
 
 function speak(t) {
@@ -200,19 +216,27 @@ function speak(t) {
 function pop(e, w) {
   const p = document.getElementById('word-popup');
   const info = vocabData[w.toLowerCase()];
-  if(!info) return;
-  const reading = info.r.replace(/【(.*?)】/g, '<span class="accent">$1</span>');
-  p.innerHTML = `<b>${w}</b><br><small>${reading}</small><br>${info.m}<br><button class="btn-speak" onclick="speak('${w}')" style="margin-top:5px; width:100%;">🔊 発音</button>`;
-  p.style.display = 'block'; p.style.left = (e.pageX + 10) + 'px'; p.style.top = (e.pageY + 10) + 'px';
+  p.innerHTML = `<b>${w}</b><br>${info.r}<br>${info.m}<br>
+    <button onclick="speak('${w}')">🔊 発音</button>
+    <button onclick="addStock('${w}')">🌟 登録</button>`;
+  p.style.display = 'block'; p.style.left = e.pageX + 'px'; p.style.top = e.pageY + 'px';
   setTimeout(() => { p.style.display = 'none'; }, 4000);
+}
+
+function addStock(w) {
+  if(!myStock.includes(w)) {
+    myStock.push(w);
+    const list = document.getElementById('vocab-list');
+    list.innerHTML += `<div style="padding:5px; border-bottom:1px solid #eee;"><b>${w}</b>: ${vocabData[w.toLowerCase()].m} <button onclick="speak('${w}')">🔊</button></div>`;
+  }
 }
 
 function judgeStrict(id, resId, correct) {
   const user = document.getElementById(id).value.trim().toLowerCase();
   const res = document.getElementById(resId);
   res.style.display = 'block';
-  if(user === correct) { res.innerHTML = "✅ 正解！素晴らしい。"; res.className = "res-area correct"; }
-  else { res.innerHTML = "❌ 不正解。正解は [" + correct + "] です。"; res.className = "res-area incorrect"; }
+  if(user === correct) { res.innerHTML = "✅ 正解！"; res.className = "res-area correct"; }
+  else { res.innerHTML = "❌ 正解は [" + correct + "]"; res.className = "res-area incorrect"; }
 }
 
 function judgeQ3() {
@@ -221,7 +245,7 @@ function judgeQ3() {
   const res = document.getElementById('res3');
   res.style.display = 'block';
   if(a.includes('自動化') && b.includes('核心')) { res.innerHTML = "✅ 正解！"; res.className = "res-area correct"; }
-  else { res.innerHTML = "❌ 違い（正解例 A:高度に自動化されたシステム B:核心）"; res.className = "res-area incorrect"; }
+  else { res.innerHTML = "❌ 解答例 A:高度に自動化されたシステム B:核心"; res.className = "res-area incorrect"; }
 }
 
 function judgeKeyword(id, resId, keywords, model) {
@@ -229,10 +253,17 @@ function judgeKeyword(id, resId, keywords, model) {
   const res = document.getElementById(resId);
   const found = keywords.filter(k => user.includes(k));
   res.style.display = 'block';
-  let html = `<div>(一致キーワード: ${found.length}/${keywords.length})</div><hr><div><b>模範解答:</b><br>${model}</div>`;
-  if(found.length === keywords.length) { res.innerHTML = "✅ 完勝！必須キーワードを網羅しています。" + html; res.className = "res-area correct"; }
-  else if(found.length > 0) { res.innerHTML = "📝 部分一致。解答を確認してください。" + html; res.className = "res-area partial"; }
-  else { res.innerHTML = "❌ キーワードが見当たりません。" + html; res.className = "res-area incorrect"; }
+  let html = `<hr>模範解答: ${model}`;
+  if(found.length === keywords.length) { res.innerHTML = "✅ 完勝！"; res.className = "res-area correct"; }
+  else { res.innerHTML = "📝 部分一致。"; res.className = "res-area partial"; }
+  res.innerHTML += html;
+}
+
+function showMode(m) {
+  document.getElementById('mode-study').style.display = m === 'study' ? 'block' : 'none';
+  document.getElementById('mode-quiz').style.display = m === 'quiz' ? 'block' : 'none';
+  document.getElementById('tab-study').className = m === 'study' ? 'active' : '';
+  document.getElementById('tab-quiz').className = m === 'quiz' ? 'active' : '';
 }
 
 init();
